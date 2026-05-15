@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>A Letter for Farhana</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --rose:#e8829a;--blush:#f5c6d0;--muted:#d4b8c8;--dimrose:#a07890;
+  --border:rgba(196,125,160,0.28);--bg:#08000f;
+}
+body{
+  min-height:100vh;background:var(--bg);display:flex;
+  align-items:center;justify-content:center;
+  font-family:'Jost',sans-serif;overflow:hidden;position:relative;
+}
+canvas#stars{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.petal{
+  position:fixed;border-radius:50% 0 50% 0;opacity:0;
+  animation:petalFall linear infinite;z-index:1;pointer-events:none;
+}
+@keyframes petalFall{
+  0%{transform:translateY(-20px) rotate(0deg);opacity:0}
+  10%{opacity:0.6}90%{opacity:0.35}
+  100%{transform:translateY(110vh) rotate(380deg);opacity:0}
+}
+
+/* ── COVER ── */
+#cover{
+  position:fixed;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;z-index:10;
+  padding:24px;text-align:center;
+  transition:opacity 0.7s ease,transform 0.7s ease;
+}
+#cover.hidden{opacity:0;transform:scale(0.92) translateY(-24px);pointer-events:none}
+
+.env-wrap{
+  width:120px;height:88px;margin-bottom:30px;position:relative;
+  animation:float 3.4s ease-in-out infinite;cursor:pointer;
+  filter:drop-shadow(0 0 16px rgba(232,130,154,0.4));
+}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-13px)}}
+.env-svg{width:100%;height:100%}
+
+.cover-for{font-size:11px;color:var(--dimrose);letter-spacing:4px;text-transform:uppercase;margin-bottom:10px;font-weight:200}
+.cover-name{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:clamp(38px,9vw,64px);color:var(--blush);letter-spacing:2px;
+  margin-bottom:6px;line-height:1;text-shadow:0 0 40px rgba(245,198,208,0.28);
+}
+.cover-sub{font-size:11px;color:var(--dimrose);letter-spacing:3px;text-transform:uppercase;margin-bottom:46px;font-weight:300}
+.open-btn{
+  background:transparent;border:1px solid rgba(196,125,160,0.5);
+  color:var(--blush);padding:14px 46px;font-size:11px;letter-spacing:3px;
+  cursor:pointer;border-radius:50px;text-transform:uppercase;
+  font-family:'Jost',sans-serif;font-weight:300;
+  transition:all 0.35s ease;
+}
+.open-btn:hover{border-color:var(--blush);color:#fff;transform:scale(1.04);box-shadow:0 0 26px rgba(232,130,154,0.2)}
+
+/* ── LETTER PAGE ── */
+#letter{
+  position:fixed;inset:0;display:flex;align-items:flex-start;
+  justify-content:center;padding:28px 24px;z-index:9;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.9s ease 0.3s;
+  overflow-y:auto;
+}
+#letter.visible{opacity:1;pointer-events:all}
+#letter::-webkit-scrollbar{width:4px}
+#letter::-webkit-scrollbar-track{background:transparent}
+#letter::-webkit-scrollbar-thumb{background:rgba(196,125,160,0.2);border-radius:4px}
+
+.letter-card{
+  background:rgba(255,255,255,0.046);
+  border:1px solid var(--border);border-radius:22px;
+  padding:clamp(28px,5vw,52px) clamp(24px,5vw,56px);
+  max-width:600px;width:100%;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  box-shadow:0 0 60px rgba(232,130,154,0.06),inset 0 1px 0 rgba(255,255,255,0.07);
+  margin:auto 0;
+}
+
+.back-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:transparent;border:1px solid rgba(196,125,160,0.3);
+  color:var(--dimrose);padding:9px 20px;font-size:10px;
+  letter-spacing:2.5px;cursor:pointer;border-radius:40px;
+  text-transform:uppercase;font-family:'Jost',sans-serif;font-weight:300;
+  transition:all 0.3s ease;margin-bottom:28px;
+}
+.back-btn:hover{border-color:var(--blush);color:var(--blush);transform:translateX(-3px)}
+
+.letter-date{font-size:10px;color:var(--dimrose);letter-spacing:2px;text-transform:uppercase;margin-bottom:22px;font-weight:300}
+.letter-greeting{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(21px,4vw,28px);color:var(--blush);margin-bottom:26px;line-height:1.4}
+
+.letter-p{
+  font-size:clamp(14px,2.3vw,15.5px);line-height:2;color:var(--muted);
+  margin-bottom:16px;opacity:0;transform:translateY(14px);
+  transition:opacity 0.75s ease,transform 0.75s ease;font-weight:300;
+}
+.letter-p.show{opacity:1;transform:none}
+
+.wa-section{
+  margin-top:28px;padding:22px 24px;
+  background:rgba(232,130,154,0.05);
+  border:1px solid rgba(196,125,160,0.18);border-radius:14px;
+  opacity:0;transform:translateY(12px);
+  transition:opacity 0.75s ease,transform 0.75s ease;text-align:center;
+}
+.wa-section.show{opacity:1;transform:none}
+.wa-text{font-size:clamp(13px,2.1vw,14.5px);color:var(--muted);line-height:1.9;margin-bottom:18px;font-weight:300}
+.wa-btn{
+  display:inline-flex;align-items:center;gap:9px;
+  background:transparent;border:1px solid rgba(196,125,160,0.5);
+  color:var(--blush);padding:12px 32px;font-size:11px;letter-spacing:2px;
+  cursor:pointer;border-radius:40px;text-transform:uppercase;
+  font-family:'Jost',sans-serif;font-weight:300;text-decoration:none;
+  transition:all 0.32s ease;
+}
+.wa-btn:hover{background:rgba(196,125,160,0.13);border-color:var(--blush);color:#fff;transform:scale(1.04);box-shadow:0 0 22px rgba(232,130,154,0.2)}
+
+.letter-closing{
+  margin-top:30px;font-family:'Cormorant Garamond',serif;font-style:italic;
+  color:var(--blush);font-size:clamp(15px,3vw,19px);line-height:1.8;
+  opacity:0;transition:opacity 0.9s ease 0.3s;
+}
+.letter-closing.show{opacity:1}
+.letter-closing strong{font-style:normal;font-weight:600;letter-spacing:0.5px}
+.letter-closing small{font-style:normal;font-size:0.8em;color:var(--dimrose);font-weight:300;letter-spacing:1px}
+.letter-footer{
+  margin-top:20px;font-size:10px;color:rgba(160,120,144,0.38);
+  letter-spacing:2px;text-transform:uppercase;text-align:center;
+  opacity:0;transition:opacity 0.9s ease 0.8s;font-weight:200;
+}
+.letter-footer.show{opacity:1}
+
+/* divider */
+.letter-divider{
+  width:40px;height:1px;background:var(--border);
+  margin:22px 0;opacity:0;transition:opacity 0.75s ease;
+}
+.letter-divider.show{opacity:1}
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<!-- COVER -->
+<div id="cover">
+  <div class="env-wrap" id="cover-env" onclick="openLetter()">
+    <svg class="env-svg" viewBox="0 0 120 88" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="envglow">
+          <feGaussianBlur stdDeviation="2" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <!-- envelope body -->
+      <rect x="4" y="22" width="112" height="62" rx="5" ry="5"
+        fill="rgba(196,100,150,0.08)" stroke="#c47da0" stroke-width="1.2"
+        filter="url(#envglow)" opacity="0.9"/>
+      <!-- closed flap -->
+      <polygon id="flap-closed" points="4,22 60,54 116,22"
+        fill="rgba(196,100,150,0.14)" stroke="#c47da0" stroke-width="1.1" opacity="0.9"/>
+      <!-- bottom fold lines -->
+      <line x1="4" y1="84" x2="42" y2="52" stroke="#c47da0" stroke-width="0.7" opacity="0.45"/>
+      <line x1="116" y1="84" x2="78" y2="52" stroke="#c47da0" stroke-width="0.7" opacity="0.45"/>
+      <!-- wax seal -->
+      <circle cx="60" cy="52" r="6" fill="rgba(232,130,154,0.3)" stroke="#e8829a" stroke-width="1.1" opacity="0.95"/>
+      <text x="60" y="56.5" font-size="7" fill="#f5c6d0" text-anchor="middle"
+        font-family="Georgia,serif" opacity="0.95">✦</text>
+    </svg>
+  </div>
+  <p class="cover-for">a letter addressed to</p>
+  <h1 class="cover-name">Farhana</h1>
+  <p class="cover-sub">written with honesty</p>
+  <button class="open-btn" onclick="openLetter()">✦ &nbsp; Open the Letter &nbsp; ✦</button>
+</div>
+
+<!-- LETTER PAGE -->
+<div id="letter">
+  <div class="letter-card">
+    <button class="back-btn" onclick="closeLetter()">← &nbsp; Back</button>
+
+    <div class="letter-date" id="letter-date"></div>
+    <div class="letter-greeting">Dear Farhana,</div>
+
+    <p class="letter-p" id="p1">
+      Hi — I hope this doesn't catch you off guard.
+      I just figured it'd be nice to actually talk more properly,
+      since we haven't really had the chance to.
+    </p>
+
+    <p class="letter-p" id="p2">
+      Honestly, there's nothing complicated behind this.
+      You come across as someone genuinely interesting to talk to,
+      and I think it'd be cool if we got to know each other better — as friends.
+    </p>
+
+    <p class="letter-p" id="p3">
+      So if you're open to it, feel free to reach out.
+      No pressure at all — I just thought I'd say something
+      rather than stay quiet about it.
+    </p>
+
+    <div class="letter-divider" id="divider"></div>
+
+    <div class="wa-section" id="wa-section">
+      <p class="wa-text">
+        My WhatsApp is linked below.<br>
+        Whenever you feel like it — no rush at all.
+      </p>
+      <a class="wa-btn"
+        href="https://wa.me/6289502390206?text=Hi%20Raynar%2C%20I%20want%20to%20be%20friends%20with%20you!"
+        target="_blank" rel="noopener">
+        → &nbsp; Message on WhatsApp
+      </a>
+    </div>
+
+    <div class="letter-closing" id="closing">
+      — <strong>Raynar</strong><br>
+      <small>genuinely means it</small>
+    </div>
+    <div class="letter-footer" id="footer">crafted with care &middot; by raynar</div>
+  </div>
+</div>
+
+<script>
+/* ── Date ── */
+const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const now=new Date();
+document.getElementById('letter-date').textContent=
+  `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} · written sincerely`;
+
+/* ── Stars ── */
+const canvas=document.getElementById('stars');
+const ctx=canvas.getContext('2d');
+let stars=[];
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;initStars()}
+function initStars(){
+  stars=Array.from({length:170},()=>({
+    x:Math.random()*canvas.width,y:Math.random()*canvas.height,
+    r:Math.random()*1.4+0.3,phase:Math.random()*Math.PI*2,
+    speed:Math.random()*0.006+0.003
+  }));
+}
+function drawStars(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  stars.forEach(s=>{
+    s.phase+=s.speed;
+    const a=0.15+0.78*Math.abs(Math.sin(s.phase));
+    ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(255,210,228,${a})`;ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+window.addEventListener('resize',resize);resize();drawStars();
+
+/* ── Petals ── */
+const pc=['#f4a5b8','#e879a0','#f9c6d2','#d47ca0','#fce4ec','#fbb6ce'];
+for(let i=0;i<22;i++){
+  const p=document.createElement('div');p.className='petal';
+  const s=6+Math.random()*10;
+  Object.assign(p.style,{
+    left:Math.random()*100+'vw',width:s+'px',height:(s*1.4)+'px',
+    background:pc[Math.floor(Math.random()*pc.length)],
+    animationDuration:(8+Math.random()*9)+'s',
+    animationDelay:(Math.random()*14)+'s'
+  });
+  document.body.appendChild(p);
+}
+
+/* ── Animations ── */
+let isAnimating=false;
+
+function openLetter(){
+  if(isAnimating)return;
+  isAnimating=true;
+
+  // Animate flap opening
+  const flap=document.getElementById('flap-closed');
+  flap.style.transition='transform 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease';
+  flap.style.transformOrigin='60px 22px';
+  flap.style.transform='scaleY(-1)';
+  flap.style.opacity='0.35';
+
+  // Paper peek from envelope
+  setTimeout(()=>{
+    const svg=document.querySelector('.env-svg');
+    const paper=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    paper.setAttribute('x','36');paper.setAttribute('y','28');
+    paper.setAttribute('width','48');paper.setAttribute('height','30');
+    paper.setAttribute('rx','3');
+    paper.setAttribute('fill','rgba(245,198,208,0.15)');
+    paper.setAttribute('stroke','rgba(196,125,160,0.4)');
+    paper.setAttribute('stroke-width','0.8');
+    paper.setAttribute('class','paper-peek');
+    paper.style.transition='transform 0.45s ease, opacity 0.4s ease';
+    paper.style.transformOrigin='60px 58px';
+    svg.insertBefore(paper, svg.lastChild);
+    requestAnimationFrame(()=>{
+      paper.style.transform='translateY(-10px)';
+      paper.style.opacity='1';
+    });
+  },180);
+
+  // Envelope scales + fades
+  setTimeout(()=>{
+    const env=document.getElementById('cover-env');
+    env.style.transition='transform 0.5s ease, opacity 0.5s ease';
+    env.style.transform='scale(1.2)';
+    env.style.opacity='0';
+  },420);
+
+  // Switch to letter
+  setTimeout(()=>{
+    document.getElementById('cover').classList.add('hidden');
+    document.getElementById('letter').classList.add('visible');
+    revealContent();
+    isAnimating=false;
+  },860);
+}
+
+function revealContent(){
+  ['p1','p2','p3'].forEach((id,i)=>{
+    setTimeout(()=>document.getElementById(id).classList.add('show'),280+i*400);
+  });
+  setTimeout(()=>document.getElementById('divider').classList.add('show'),1300);
+  setTimeout(()=>document.getElementById('wa-section').classList.add('show'),1580);
+  setTimeout(()=>{
+    document.getElementById('closing').classList.add('show');
+    document.getElementById('footer').classList.add('show');
+  },2280);
+}
+
+function closeLetter(){
+  if(isAnimating)return;
+  isAnimating=true;
+
+  // Fade out letter
+  const letter=document.getElementById('letter');
+  letter.style.transition='opacity 0.5s ease';
+  letter.style.opacity='0';
+
+  setTimeout(()=>{
+    // Reset letter state
+    letter.classList.remove('visible');
+    letter.style.opacity='';letter.style.transition='';
+    ['p1','p2','p3','divider','wa-section','closing','footer']
+      .forEach(id=>document.getElementById(id).classList.remove('show'));
+
+    // Reset envelope
+    const env=document.getElementById('cover-env');
+    env.style.transition='none';env.style.transform='';env.style.opacity='';
+    const flap=document.getElementById('flap-closed');
+    flap.style.transition='none';flap.style.transform='';flap.style.opacity='';
+    document.querySelectorAll('.paper-peek').forEach(e=>e.remove());
+
+    // Animate cover back in
+    const cover=document.getElementById('cover');
+    cover.style.opacity='0';
+    cover.style.transform='scale(1.06) translateY(18px)';
+    cover.style.transition='none';
+    cover.classList.remove('hidden');
+
+    requestAnimationFrame(()=>{requestAnimationFrame(()=>{
+      cover.style.transition='opacity 0.65s ease, transform 0.65s ease';
+      cover.style.opacity='1';cover.style.transform='';
+      setTimeout(()=>{cover.style.transition='';isAnimating=false},700);
+    })});
+  },560);
+}
+</script>
+</body>
+</html>
